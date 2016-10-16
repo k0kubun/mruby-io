@@ -272,6 +272,13 @@ class IO
     array.join
   end
 
+  def fcntl(cmd, arg = 0)
+    unless arg.is_a?(Fixnum)
+      arg = arg ? 1 : 0
+    end
+    _fcntl(cmd, arg)
+  end
+
   def gets(*args)
     begin
       readline(*args)

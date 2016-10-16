@@ -519,6 +519,18 @@ mrb_io_check_readable(mrb_state *mrb, mrb_value self)
 }
 
 mrb_value
+mrb_io_fcntl(mrb_state *mrb, mrb_value io)
+{
+  struct mrb_io *fptr;
+  mrb_int cmd, arg, flags;
+
+  mrb_get_args(mrb, "ii", &cmd, &arg);
+  fptr = (struct mrb_io *)mrb_get_datatype(mrb, io, &mrb_io_type);
+  flags = fcntl(fptr->fd, cmd, arg);
+  return mrb_fixnum_value(flags);
+}
+
+mrb_value
 mrb_io_isatty(mrb_state *mrb, mrb_value self)
 {
   struct mrb_io *fptr;
@@ -1084,6 +1096,7 @@ mrb_init_io(mrb_state *mrb)
 
   mrb_define_method(mrb, io, "initialize", mrb_io_initialize, MRB_ARGS_ANY());    /* 15.2.20.5.21 (x)*/
   mrb_define_method(mrb, io, "_check_readable", mrb_io_check_readable, MRB_ARGS_NONE());
+  mrb_define_method(mrb, io, "_fcntl",     mrb_io_fcntl,      MRB_ARGS_REQ(2));
   mrb_define_method(mrb, io, "isatty",     mrb_io_isatty,     MRB_ARGS_NONE());
   mrb_define_method(mrb, io, "sync",       mrb_io_sync,       MRB_ARGS_NONE());
   mrb_define_method(mrb, io, "sync=",      mrb_io_set_sync,   MRB_ARGS_REQ(1));
