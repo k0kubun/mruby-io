@@ -652,7 +652,11 @@ mrb_io_sysread(mrb_state *mrb, mrb_value io)
       }
       break;
     case -1: /* Error */
-      mrb_sys_fail(mrb, "sysread failed");
+      if (errno == EAGAIN) {
+        mrb_raise(mrb, mrb_class_get_under(mrb, mrb_module_get(mrb, "Errno"), "EAGAIN"), "sysread failed");
+      } else {
+        mrb_sys_fail(mrb, "sysread failed");
+      }
       break;
     default:
       if (RSTRING_LEN(buf) != ret) {
