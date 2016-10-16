@@ -272,6 +272,24 @@ class IO
     array.join
   end
 
+  def read_nonblock(length = nil)
+    flags = fcntl(Fcntl::F_GETFL)
+    if (flags & Fcntl::O_NONBLOCK) == 0
+      fcntl(Fcntl::F_SETFL, flags | Fcntl::O_NONBLOCK)
+    end
+
+    _read_buf
+    if length && @buf.size >= length
+      ret = @buf[0...length]
+      @buf = @buf[length..-1]
+      ret
+    else
+      ret = @buf
+      @buf = ''
+      ret
+    end
+  end
+
   def fcntl(cmd, arg = 0)
     unless arg.is_a?(Fixnum)
       arg = arg ? 1 : 0
